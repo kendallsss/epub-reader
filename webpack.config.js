@@ -100,7 +100,7 @@ if (process.env.NODE_ENV !== 'production') {
       {
         test: /\.js$/,
         loader: 'eslint-loader',
-        exclude: /node_modules/
+        exclude: [/node_modules/, /lib/]
       },
       {
         test: /\.vue$/,

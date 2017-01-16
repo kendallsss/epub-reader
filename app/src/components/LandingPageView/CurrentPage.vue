@@ -14,14 +14,14 @@
 
 <template>
   <p>
-    你当前 <code>`{{ $route.path }}`</code> on the <code>`{{ $route.name }}`</code> view.
+    你当前 <code>`{{ xml }}`</code> on the <code>`{{ $route.name }}`</code> view.
   </p>
 </template>
 
 <script>
+  // var parser = require('xml2json')
   export default {
     created () {
-      // Set $route values that are not preset during unit testing
       if (process.env.NODE_ENV === 'testing') {
         this.$route = {
           name: 'landing-page',

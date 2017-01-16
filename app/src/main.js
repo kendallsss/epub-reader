@@ -21,3 +21,5 @@ new Vue({
   router,
   ...App
 }).$mount('#app')
+
+// Set $route values that are not preset during unit testing

@@ -4,11 +4,13 @@
   "description": "a epub book reader",
   "main": "electron.js",
   "dependencies": {
+    "decompress-zip": "^0.3.0",
     "vue": "^2.0.1",
     "vue-electron": "^1.0.0",
     "vue-resource": "^1.0.3",
     "vue-router": "^2.0.0",
-    "vuex": "^2.0.0"
+    "vuex": "^2.0.0",
+    "xml-json-parser": "^1.1.8"
   },
   "devDependencies": {},
   "author": "freypy <freypy@live.com>"
