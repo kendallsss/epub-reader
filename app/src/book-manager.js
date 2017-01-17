@@ -2,7 +2,7 @@
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
-import {uncompress} from 'src/lib/tools'
+import {uncompress, removeDir} from 'src/lib/tools'
 // 传入文件，返回 md5 hash code
 function hash (content) {
   let md5 = crypto.createHash('md5')
@@ -33,8 +33,20 @@ export function loadEpub (filePath, storePath) {
 }
 export default class BookManager {
   constructor (storePath) {
-    this.storePath = path.join(__dirname, '/BookLib/')
+    this.storePath = path.join('./', '/BookLib/')
+    this.indexPath = path.join(this.storePath, 'book.index')
     this.bookList = []
+    try {
+      let f = fs.readFileSync(this.indexPath, 'utf8')
+      this.bookList = JSON.parse(f)
+      console.log('存在书库索引，已读取', this.bookList)
+    } catch (error) {
+      this.bookList = []
+      console.log('不存在书库索引，已建立')
+    }
+  }
+  saveIndex () {
+    fs.writeFileSync(this.indexPath, JSON.stringify(this.bookList), {'encoding': 'utf8'})
   }
   addBook (filePath) {
     let book = new Book(filePath, this.storePath)
@@ -42,6 +54,21 @@ export default class BookManager {
       if (this.bookList[i].id === book.id) return
     }
     this.bookList.push(book)
+    this.saveIndex()
+  }
+  removeBook (bookID) {
+    for (var i in this.bookList) {
+      let book = this.bookList[i]
+      if (book.id === bookID) {
+        removeDir(book.localPath)
+        this.bookList.splice(i, 1)
+        this.saveIndex()
+        console.log('成功移除书籍：', bookID)
+        return true
+      }
+    }
+    console.warn('移除的书籍不存在：', bookID)
+    return false
   }
 }
 
@@ -51,7 +78,8 @@ export class Book {
     let bookID = loadEpub(filePath, storePath)
     let distPath = storePath + bookID
     console.log(`载入完毕，缓存路径： '${distPath}`)
-    this.distPath = distPath
+    this.localPath = distPath
     this.id = bookID
+    this.name = ''
   }
 }
