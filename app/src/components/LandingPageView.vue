@@ -20,9 +20,9 @@
   import Links from './LandingPageView/Links'
   import Versions from './LandingPageView/Versions'
   import Json from 'xml-json-parser'
-  function test (func, obj) {
+  function timeit (func, obj, time = 1) {
     var start = new Date().getTime()
-    for (var i = 0; i < 1; i++) {
+    for (var i = 0; i < time; i++) {
       func(obj)
     }
     var end = new Date().getTime()
@@ -46,7 +46,7 @@
       }
 
       this.xmlAsStr = x2js.json2xml_str(jsonObj)
-      console.log(test(x2js.json2xml_str, jsonObj))
+      console.log(timeit(x2js.json2xml_str, jsonObj))
     },
     name: 'landing-page'
   }

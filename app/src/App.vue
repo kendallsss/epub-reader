@@ -33,11 +33,21 @@
 
 <script>
   import store from 'src/vuex/store'
-  import MD5 from 'src/lib/md5.min.js'
-  import fs from 'fs'
-  let filename = 'G:/react-treebeard/epub/回到明朝当王爷.epub'
-  let f = fs.readFileSync(filename, 'utf8')
-  console.log(filename, MD5(f))
+  import BookManager from './book-manager'
+
+  let bookPath = 'G:/react-treebeard/epub/回到明朝当王爷.epub'
+  let book = new BookManager()
+  book.addBook(bookPath)
+  console.log(book)
+  // console.log(timeit(md5.update, content))
+  // md5.update(content)
+  // var d = md5.digest('hex')
+  // console.log(d)
+
+  // import MD5 from 'src/lib/md5.min.js'
+
+  // window.f = f
+  // console.log(filename, MD5(f))
   // fs.createReadStream('G:/react-treebeard/epub/回到明朝当王爷.epub').pipe(unzip.Extract({ path: '回到明朝' }))
   export default {
     store
