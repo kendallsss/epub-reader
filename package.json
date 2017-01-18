@@ -76,6 +76,5 @@
     "webpack-dev-server": "^1.14.1"
   },
   "dependencies": {
-    "decompress-zip": "^0.3.0"
   }
 }

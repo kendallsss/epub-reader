@@ -60,21 +60,13 @@
   import store from 'src/vuex/store'
   import BookManager from './book-manager'
 
+  import DOMParser from 'xmldom'
+
   let bookPath = 'G:/react-treebeard/epub/回到明朝当王爷.epub'
   let bm = new BookManager()
 
-  bm.removeBook('c5b1d7a57f2668f1b24e3a0df2a80020')
+  // bm.removeBook('c5b1d7a57f2668dsdf3a0df2a80020')
   bm.addBook(bookPath)
-  // console.log(timeit(md5.update, content))
-  // md5.update(content)
-  // var d = md5.digest('hex')
-  // console.log(d)
-
-  // import MD5 from 'src/lib/md5.min.js'
-
-  // window.f = f
-  // console.log(filename, MD5(f))
-  // fs.createReadStream('G:/react-treebeard/epub/回到明朝当王爷.epub').pipe(unzip.Extract({ path: '回到明朝' }))
   export default {
     store,
     methods: {

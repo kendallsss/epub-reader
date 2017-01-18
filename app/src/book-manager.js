@@ -12,21 +12,21 @@ function hash (content) {
 }
 // 尝试载入epub,建立缓存
 // 注意返回值为路径 (md5 hash code)
-export function loadEpub (filePath, storePath) {
-  fs.exists(filePath, (exists) => {
-    if (!exists) {
-      throw new Error(`文件不存在：${filePath}`)
-    }
-  })
-  let content = fs.readFileSync(filePath)
+export function cacheEpub (filePath, storePath) {
+  let content
+  try {
+    content = fs.readFileSync(filePath)
+  } catch (error) {
+    console.warn(`载入的书籍不存在：${filePath}`)
+    return
+  }
+
   let hashcode = hash(content)
   let distPath = path.join(storePath, hashcode)
   fs.exists(distPath, (exists) => {
     if (!exists) {
-      console.log('解压中...')
+      console.log('建立缓存文件中...')
       uncompress(filePath, distPath)
-    } else {
-      console.log('已有缓存')
     }
   })
   return hashcode
@@ -36,50 +36,69 @@ export default class BookManager {
     this.storePath = path.join('./', '/BookLib/')
     this.indexPath = path.join(this.storePath, 'book.index')
     this.bookList = []
+    // 读取书库索引
     try {
       let f = fs.readFileSync(this.indexPath, 'utf8')
       this.bookList = JSON.parse(f)
-      console.log('存在书库索引，已读取', this.bookList)
     } catch (error) {
       this.bookList = []
-      console.log('不存在书库索引，已建立')
+      console.log('不存在书库索引，重新建立索引...')
     }
   }
   saveIndex () {
-    fs.writeFileSync(this.indexPath, JSON.stringify(this.bookList), {'encoding': 'utf8'})
+    try {
+      fs.writeFileSync(this.indexPath, JSON.stringify(this.bookList), {'encoding': 'utf8'})
+    } catch (error) {
+      console.error('写入缓存失败，请检查是否有写入该目录权限')
+    }
   }
   addBook (filePath) {
     let book = new Book(filePath, this.storePath)
-    for (var i in this.bookList) {
-      if (this.bookList[i].id === book.id) return
+    if (this.exist(book.id)) {
+      console.warn('这本书已经在目录中：', book.id)
+      this.saveIndex()
+      return
     }
     this.bookList.push(book)
     this.saveIndex()
   }
-  removeBook (bookID) {
+  exist (targetID) {
     for (var i in this.bookList) {
-      let book = this.bookList[i]
-      if (book.id === bookID) {
-        removeDir(book.localPath)
-        this.bookList.splice(i, 1)
-        this.saveIndex()
-        console.log('成功移除书籍：', bookID)
+      if (this.bookList[i].id === targetID) {
         return true
       }
     }
-    console.warn('移除的书籍不存在：', bookID)
+    return false
+  }
+  removeBook (targetID) {
+    for (var i in this.bookList) {
+      let book = this.bookList[i]
+      if (book.id === targetID) {
+        removeDir(book.localPath)
+        this.bookList.splice(i, 1)
+        this.saveIndex()
+        console.log('成功移除书籍：', targetID)
+        return true
+      }
+    }
+    console.warn('准备移除的书籍不存在：', targetID)
     return false
   }
 }
 
+import {getOpf} from './lib/epub'
 export class Book {
   constructor (filePath, storePath) {
-    console.log(`载入新书籍，路径：${filePath}`)
-    let bookID = loadEpub(filePath, storePath)
+    let bookID = cacheEpub(filePath, storePath)
     let distPath = storePath + bookID
-    console.log(`载入完毕，缓存路径： '${distPath}`)
     this.localPath = distPath
     this.id = bookID
-    this.name = ''
+    this.loadOpf()
+    this.title = this.opf.title
+  }
+  loadOpf () {
+    if (!this.opf) {
+      this.opf = getOpf(path.join(this.localPath, 'OEBPS/content.opf'))
+    }
   }
 }

@@ -1,4 +1,4 @@
-'use strict;'
+'use strict'
 var DecompressZip = require('decompress-zip')
 import fs from 'fs'
 export function uncompress (ZIP_FILE_PATH, DESTINATION_PATH, debug = false) {
@@ -14,7 +14,7 @@ export function uncompress (ZIP_FILE_PATH, DESTINATION_PATH, debug = false) {
         if (debug) console.log('Finished extracting', log)
     })
 
-    // Notify "progress" of the decompressed files
+    // Notify 'progress' of the decompressed files
     unzipper.on('progress', function (fileIndex, fileCount) {
         if (debug) console.log('Extracted file ' + (fileIndex + 1) + ' of ' + fileCount)
     })
