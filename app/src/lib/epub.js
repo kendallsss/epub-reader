@@ -8,7 +8,6 @@ Promise.promisifyAll(fs)
 class RootfileParser {
   constructor(callback) {
     this.callback = callback
-    this.onEntry = false
   }
   onopentag(name, attribs) {
     if (name === 'rootfile' && attribs['full-path']) {
@@ -21,70 +20,76 @@ class RootfileParser {
     }
   }
 }
-class TagHandler {
-  constructor (tagname) {
-    this.tagname = tagname
-    this.buffer
-  }
-  onopentag (name, attribs) {
-    this.buffer.attribs = attribs
-  }
-  ontext (text) {
-    this.buffer.text = text
-  }
-  onclosetag (tagname) {
-    if (tagname === this.tagname)
-    return this.buffer
-  }
-}
+// class TagHandler {
+//   constructor (tagname) {
+//     this.tagname = tagname
+//     this.buffer
+//   }
+//   onopentag (name, attribs) {
+//     this.buffer.attribs = attribs
+//   }
+//   ontext (text) {
+//     this.buffer.text = text
+//   }
+//   onclosetag (tagname) {
+//     if (tagname === this.tagname)
+//     return this.buffer
+//   }
+// }
 class OpfParser {
   constructor(callback) {
     if (!this.starttime) this.starttime = new Date()
-
-    this.tags = ['metadata', 'manifest', 'spine']
-    // console.log('onmeta', onmeta.onclosetag())
-    this.curTag = 'metadata'
-    this.metadata = []
+    this.data = {}
+    this.blockNameList = ['guide', 'spine', 'manifest', 'metadata']
+    this.curBlock = this.blockNameList.pop()
+    this.blocks = []
     this.tagbuffer = {}
-    this.onEntry = false
+    this.onBlock = false
     this.callback = callback
   }
   onopentag(name, attribs) {
-    if (name !== this.curTag) {
-      this.finished = true
+    if (this.curBlock === name) {
+      this.onBlock = true
+      return
     }
-    if (name === 'manifest') {
-      this.finished = true
-      this.callback(null, this.metadata)
+    if (name !== this.curBlock && this.blockNameList[this.blockNameList.length - 1] === name) {
+      this.curBlock = this.blockNameList.pop()
+      this.onBlock = true
       return
     }
     // 接受的第一个参数是error, 第二个参数是返回结果
-    if (this.onEntry) {
+    if (this.onBlock) {
+      this.tagname = name
       this.tagbuffer = {}
-      this._name = name
-      this.tagbuffer[this._name] = ''
-      if (name === 'meta' && attribs.name === 'cover') {
-        console.log('有封面', attribs.content)
-        this.metadata.push({cover: attribs.content})
-      }
-    } else if (this.curTag === name) {
-      this.onEntry = true
+      this.tagbuffer.tagname = this.tagname
+      if (Object.getOwnPropertyNames(attribs).length > 0) this.tagbuffer.attribs = attribs
     }
   }
   ontext(text) {
-    if (this._name && !this.tagbuffer[this._name]) {
-      this.tagbuffer[this._name] = text.replace(/[\r\n\t ]/g, '')
+    if (this.tagname && !this.tagbuffer[this.tagname]) {
+      let rs = text.replace(/[\r\n\t ]/g, '')
+      if (rs !== '') {
+        this.tagbuffer.text = rs
+      }
     }
   }
   onclosetag(name) {
-    if (name === this.curTag) {
-      this.onEntry = false
-      this._name = undefined
+    // 遇到Tag结束 保存Tag到Blocks
+    // 遇到当前Block结束 保存Block到最终结果
+    if (name === this.curBlock) {
+      this.onBlock = false
+      this.data[this.curBlock] = this.blocks
+      this.blocks = []
+    // 遇到最后一个闭合标签，返回buffer
+      if (this.blockNameList.length === 0) {
+        this.callback(null, this.data)
+      }
     }
-    if (this.onEntry) {
-      this.metadata.push(this.tagbuffer)
-      console.log('close')
+    if (this.onBlock) {
+      if (this.tagbuffer) this.blocks.push(this.tagbuffer)
+      this.tagname = undefined
     }
+    this.tagbuffer = {}
   }
 }
 

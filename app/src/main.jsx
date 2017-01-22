@@ -18,8 +18,9 @@ function test(e) {
     bm
       .pushBook(file2)
       .then((book) => {
-        console.log('新加入书架：', book)
-        console.log(book.getMetaData('cover'))
+        console.log('OPF->>：', book.opf)
+        console.log(book.getCoverUrl())
+        // console.log(book.getMetaData('cover'))
       })
   } catch (err) {
     console.log(err)
@@ -48,7 +49,7 @@ ReactDOM.render(
   <ul id="stage">
     <li data-tags="Print Design"><img
       onClick={(e) => test(e)}
-      src='G:\GitHub\epub-reader\回到明朝当王爷\OEBPS\Images\84024_5_224-N.jpg'
+      src={require('./assets/img/shots/2.jpg')}
       alt="Illustration"/></li>
     <li data-tags="Logo Design,Print Design"><img src={require('./assets/img/shots/2.jpg')} alt="Illustration"/></li>
     <li data-tags="Web Design,Logo Design"><img src={require('./assets/img/shots/3.jpg')} alt="Illustration"/></li>

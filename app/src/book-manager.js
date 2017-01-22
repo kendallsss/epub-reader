@@ -100,7 +100,7 @@ class BookManager {
 
     return booknamelist
   }
-  async pushBook(filePath) {
+  async pushBook(filePath, save = false) {
     let book = new Book(filePath, this.storePath)
     let bookID = await book.loadAsync()
     if (!bookID) return
@@ -111,6 +111,7 @@ class BookManager {
       console.log('有新书加入目录：', book.id)
       this.bookList.push(book)
     }
+    if (save) this.writeCatalog()
     return this.selectBook(bookID)
   }
   selectBook(bookID) {
@@ -154,10 +155,26 @@ class Book {
     this.opf = json.opf
     this.id = json.id
     this.localPath = json.localPath
+    this.coverUrl = json.coverUrl
+  }
+  getCoverUrl() {
+    let metadata = this.opf.metadata
+    let content
+    for (let node of metadata) {
+      if (node.attribs && node.attribs.name === 'cover') content = node.attribs.content
+    }
+    if (content) {
+      let manifest = this.opf.manifest
+      for (let node of manifest) {
+        if (node.attribs.id === content) return node.attribs.href
+      }
+    }
   }
   getMetaData(key) {
-    for (let i in this.opf) {
-      if (this.opf[i][key]) return (this.opf[i][key])
+    if (arguments.length === 0) return this.opf.metadata
+    let metadata = this.opf.metadata
+    for (let node of metadata) {
+      if (node.tagname === key) return (node.text)
     }
   }
   async loadAsync() {
@@ -177,6 +194,7 @@ class Book {
       console.error('读取opf文件出错。')
       throw error
     }
+    this.coverUrl = this.getCoverUrl()
     return this.id
   }
 }
