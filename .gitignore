@@ -9,4 +9,5 @@ npm-debug.log
 npm-debug.log.*
 thumbs.db
 !.gitkeep
-BookLib
+BookLib/*
+.vscode
