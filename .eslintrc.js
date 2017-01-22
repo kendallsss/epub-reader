@@ -2,7 +2,12 @@ module.exports = {
   root: true,
   parser: 'babel-eslint',
   parserOptions: {
-    sourceType: 'module'
+    sourceType: 'module',
+    allowImportExportEverywhere: true
+  },
+  ecmaFeatures: {
+    modules: true,
+    allowImportExportEverywhere: true // ！允许不在文件头import和export，为了兼容react-hot-loader
   },
   env: {
     browser: true,
@@ -20,6 +25,9 @@ module.exports = {
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 2 : 0,
     'no-unused-vars': 0,
-    'indent': 0
+    'indent': 0,
+    'no-multiple-empty-lines': [1, {max: 3}],
+    "space-before-function-paren": 0,
+    'react/jsx-filename-extension': [1, { 'extensions': ['.js', '.jsx'] }],
   }
 }

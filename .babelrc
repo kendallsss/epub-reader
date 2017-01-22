@@ -1,4 +1,6 @@
 {
-  "presets": ["es2015", "stage-0"],
-  "plugins": ["transform-runtime"]
+  "presets": ["es2015", "stage-0", "react"],
+  "plugins": ["transform-runtime",
+   "react-hot-loader/babel" // 这里使用插件载入react-hot-loader
+  ]
 }

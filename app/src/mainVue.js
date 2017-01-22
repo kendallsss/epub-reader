@@ -1,3 +1,5 @@
+
+var a = 1
 import Vue from 'vue'
 import Electron from 'vue-electron'
 import Resource from 'vue-resource'

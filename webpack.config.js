@@ -14,8 +14,9 @@ let config = {
     formatter: require('eslint-friendly-formatter')
   },
   entry: {
-    build: path.join(__dirname, 'app/src/main.js')
+    build: path.join(__dirname, 'app/src/main.jsx')
   },
+
   module: {
     preLoaders: [],
     loaders: [
@@ -23,23 +24,23 @@ let config = {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract('style-loader', 'css-loader')
       },
+      // {
+      //   test: /\.html$/,
+      //   loader: 'vue-html-loader'
+      // },
       {
-        test: /\.html$/,
-        loader: 'vue-html-loader'
-      },
-      {
-        test: /\.js$/,
-        loader: 'babel-loader',
+        test: /\.(js|jsx)$/,
+        loaders: ['babel-loader'], // 不在这里载入react-hot-loader，在.babelrc配置为plugin方式载入
         exclude: /node_modules/
       },
       {
         test: /\.json$/,
         loader: 'json-loader'
       },
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader'
-      },
+      // {
+      //   test: /\.vue$/,
+      //   loader: 'vue-loader'
+      // },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
         loader: 'url-loader',
@@ -76,19 +77,19 @@ let config = {
       'components': path.join(__dirname, 'app/src/components'),
       'src': path.join(__dirname, 'app/src')
     },
-    extensions: ['', '.js', '.vue', '.json', '.css'],
+    extensions: ['', '.js', '.jsx', '.json', '.css'],
     fallback: [path.join(__dirname, 'app/node_modules')]
   },
   resolveLoader: {
     root: path.join(__dirname, 'node_modules')
   },
-  target: 'electron-renderer',
-  vue: {
-    loaders: {
-      sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
-      scss: 'vue-style-loader!css-loader!sass-loader'
-    }
-  }
+  target: 'electron-renderer'
+  // vue: {
+  //   loaders: {
+  //     sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax=1',
+  //     scss: 'vue-style-loader!css-loader!sass-loader'
+  //   }
+  // }
 }
 
 if (process.env.NODE_ENV !== 'production') {
@@ -101,11 +102,11 @@ if (process.env.NODE_ENV !== 'production') {
         test: /\.js$/,
         loader: 'eslint-loader',
         exclude: [/node_modules/, /lib/]
-      },
-      {
-        test: /\.vue$/,
-        loader: 'eslint-loader'
       }
+      // {
+      //   test: /\.vue$/,
+      //   loader: 'eslint-loader'
+      // }
     )
   }
 }
